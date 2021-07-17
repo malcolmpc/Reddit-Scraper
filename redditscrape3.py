@@ -1,15 +1,17 @@
 import pandas as pd
 import praw
 import textstat
+import os
+from dotenv import load_dotenv
+from praw.models import MoreComments
 
-for top_level_comment in submission.comments[1:]:
-    if isinstance(top_level_comment, MoreComments):
-        continue
-    posts.append(top_level_comment.body)
-posts = pd.DataFrame(posts,columns=["body"])
-indexNames = posts[(posts.body == '[removed]') | (posts.body == '[deleted]')].index
-posts.drop(indexNames, inplace=True)
-print(posts)
+load_dotenv()
+AGENT = os.getenv('USER_AGENT')
+CLIENT = os.getenv('CLIENT_ID')
+SECRET = os.getenv('CLIENT_SECRET')
+
+reddit = praw.Reddit(user_agent=AGENT,
+                     client_id=CLIENT, client_secret=SECRET)
 
 posts = []
 for submission in reddit.subreddit("nba").new():
@@ -18,4 +20,4 @@ for submission in reddit.subreddit("nba").new():
             continue
         posts.append(top_level_comment.body)
 
-textstat.flesch_kincaid_grade(posts[1])
+print(textstat.flesch_kincaid_grade(posts[1]))
